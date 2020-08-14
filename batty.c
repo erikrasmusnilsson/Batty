@@ -27,23 +27,44 @@ void print_battery(int battery)
 {
 	int battery_norm = 1;
 	int section_size = CAPACITY / 3;
-	printf("\r");
-	for (int i = 0; i < battery / battery_norm; i++) 
+	printf("\r\033[2A");
+	for (int j = 0; j < 2; j++)
 	{
-		if (i < section_size) printf("\033[0;31m");
-		else if (i < section_size * 2) printf("\033[0;33m");
-		else printf("\033[0;32m");
-		printf("[");
+		for (int i = 0; i < battery / battery_norm; i++) 
+		{
+			if (i < section_size) printf("\033[0;31m");
+			else if (i < section_size * 2) printf("\033[0;33m");
+			else printf("\033[0;32m");
+			printf("[");
+		}
+		printf("\033[0;34m");
+		for (int i = 0; i < CAPACITY / battery_norm - battery / battery_norm; i++) 
+		{
+			printf("-");
+		}
+		printf("\033[0;0m");
+		printf("\n");
 	}
-	printf("\033[0;34m");
-	for (int i = 0; i < CAPACITY / battery_norm - battery / battery_norm; i++) 
-	{
-		printf("-");
-	}
-	printf("\033[0;0m");
-	printf("%d%%", battery);
 	fflush(stdout);
 }
+
+void print_header() 
+{
+	FILE *file;
+	char buffer[128];
+
+	if ((file = fopen("./hdr.txt", "r")) == NULL) 
+	{
+		printf("Ouch mah doo...\n");
+		return;
+	}
+	printf("\033[0;35m");
+	while (fgets(buffer, 128, file) != NULL) printf("%s", buffer);
+	fclose(file);
+	printf("\033[0;0m");
+	printf("\n\n");
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -52,6 +73,8 @@ int main(int argc, char *argv[])
 	{
 	       	DEBUG = 1;
 	}
+	printf("\033[2J");
+	print_header();
 	while(1)
 	{
 		pthread_t thread_id;
